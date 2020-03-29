@@ -54,7 +54,7 @@ def write_file_header(write_file):
 def write_file_row(erg, rowindex, write_file):
     monitor = erg.get_monitor() #get monitor data to output
     #Write data to write_file
-    workoutdata = str(rowindex) + "," + str(time.time() + monitor['time']) + "," + str(monitor['distance']) + "," + str(monitor['spm']) + ","  + \
+    workoutdata = str(rowindex) + "," + str(time.time()) + "," + str(monitor['distance']) + "," + str(monitor['spm']) + ","  + \
         str(monitor['pace']) + "," + str(monitor['power']) + "," + str(monitor['heartrate']) + "," + str(monitor['time'])
 
     #print("Writing: " + str(workoutdata))
