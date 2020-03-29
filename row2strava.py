@@ -1,18 +1,10 @@
 #!/usr/bin/env python
-#Copyright (c) 2011, Sam Gambrell
-#Licensed under the Simplified BSD License.
+# Copyright (c) 2020, Edd Beale
+# Licensed under the Simplified BSD License.
+# Inspiration taken from an example from Sam Gambrell (c) 2011 from pyrow
 
-#This is an example file to show how to make use of pyrow
-#Have the rowing machine on and plugged into the computer before starting the program
-#The program will record Time, Distance, SPM, Pace, and Force Data for each
-#stroke and save it to 'workout.csv'
+# Records woring workouts on a C2 Rower using Py3Row and then coverts them to TCX format for upload to Strava using rowingdata
 
-# NOTE: This code has not been thoroughly tested and may not function as advertised.
-# Please report and findings to the author so that they may be addressed in a stable release.
-
-# import os
-# import sys
-# sys.path.insert(0, os.path.abspath('..'))
 from pyrow import pyrow
 from rowingdata.rowingdata import rowingdata as rowingdataclass
 import rowingdata
@@ -22,12 +14,12 @@ import time
 def wait_for_workout_start(erg):
     #Loop until workout has begun
     workout = erg.get_workout()
-    print("wait_for_workout_start: workout['state'] = " + str(workout['state']))
+    #print("wait_for_workout_start: workout['state'] = " + str(workout['state']))
     while workout['state'] == 0:
         time.sleep(0.4)
         workout = erg.get_workout()
         #print("wait_for_workout_start: workout['state'] = " + str(workout['state']))
-    print("wait_for_workout_start: Workout has begun")
+    #print("wait_for_workout_start: Workout has begun")
 
 def wait_for_stroke_start(erg):
     forceplot = erg.get_forceplot()
@@ -38,8 +30,8 @@ def wait_for_stroke_start(erg):
         time.sleep(0.2)
         forceplot = erg.get_forceplot()
         workout = erg.get_workout()
-        print("wait_for_stroke_start: forceplot['strokestate'] = " + str(forceplot['strokestate']) + " workout['state'] = " + str(workout['state']))
-    print("wait_for_stroke_start: Starting Stroke")
+        #print("wait_for_stroke_start: forceplot['strokestate'] = " + str(forceplot['strokestate']) + " workout['state'] = " + str(workout['state']))
+    #print("wait_for_stroke_start: Starting Stroke")
 
 
 def wait_for_stroke_end(erg):
@@ -51,8 +43,8 @@ def wait_for_stroke_end(erg):
         time.sleep(0.2)
         forceplot = erg.get_forceplot() 
         workout = erg.get_workout()
-        print("wait_for_stroke_end: forceplot['strokestate'] = " + str(forceplot['strokestate']) + " workout['state'] = " + str(workout['state']))
-    print("wait_for_stroke_end: Done Stroke")
+        #print("wait_for_stroke_end: forceplot['strokestate'] = " + str(forceplot['strokestate']) + " workout['state'] = " + str(workout['state']))
+    #print("wait_for_stroke_end: Done Stroke")
 
 
 def write_file_header(write_file):
@@ -65,7 +57,7 @@ def write_file_row(erg, rowindex, write_file):
     workoutdata = str(rowindex) + "," + str(time.time() + monitor['time']) + "," + str(monitor['distance']) + "," + str(monitor['spm']) + ","  + \
         str(monitor['pace']) + "," + str(monitor['power']) + "," + str(monitor['heartrate']) + "," + str(monitor['time'])
 
-    print("Writing: " + str(workoutdata))
+    #print("Writing: " + str(workoutdata))
     write_file.write(workoutdata + '\n')
 
 
@@ -83,10 +75,15 @@ def main():
 
     while True:
 
+        print("Waiting to Start a New Workout...")
+
         wait_for_workout_start(erg=erg)
 
         # Now open and prepare csv file with current timestamp
         filename = "workout_" + str(time.time())
+
+        print("Starting a New Workout: " + filename)
+
         filename_csv = filename + ".csv"
         write_file = open(filename_csv, 'w')
 
@@ -112,7 +109,8 @@ def main():
             workout = erg.get_workout()
             index = index + 1
         
-        print("Workout has ended")
+        print("Ending Workout: " + filename)
+
         write_file.close()
 
         if rows_written == True:
@@ -121,6 +119,11 @@ def main():
                                     rower=rower)
             filename_tcx=filename+".tcx"
             res.exporttotcx(filename_tcx)
+
+            print("Workout TCX Export Complete: " + filename)
+        else:
+            print("Workout Empty!: " + filename)
+        
 
 
 if __name__ == '__main__':
